@@ -1,0 +1,38 @@
+name: Release
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: '0'
+
+    - id: bump-version
+      name: Bump version and push tag
+      uses: anothrNick/github-tag-action@1.36.0
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+        WITH_V: true
+        RELEASE_BRANCHES: .*
+        DEFAULT_BUMP: patch
+
+    - name: Create github release
+      uses: softprops/action-gh-release@v1
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        tag_name: ${{ steps.bump-version.outputs.new_tag }}
+        files: |
+          dist/helmgen-${{ steps.bump-version.outputs.new_tag }}-darwin-amd64.tar.gz
+          dist/helmgen-${{ steps.bump-version.outputs.new_tag }}-darwin-amd64.zip
+          dist/helmgen-${{ steps.bump-version.outputs.new_tag }}-linux-amd64.tar.gz
+          dist/helmgen-${{ steps.bump-version.outputs.new_tag }}-linux-amd64.zip

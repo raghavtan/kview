@@ -52,7 +52,7 @@ class MyHomePage extends StatelessWidget {
             onPressed: () {
               print('button pressed!');
             },
-            child: Text('Next'),
+            child: const Text('Next'),
           ),
 
         ],
